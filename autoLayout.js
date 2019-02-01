@@ -17,26 +17,19 @@ function autoLayout(tableMatrix, availableTableWidth) {
     });
 
     // Calculate each column's minWidth and maxWidth
-    const columns = [];
-    for (let j=0; j < m; j++){
-        columns[j] = {
-            minWidth: 0,    // Will be the maximum of the minimum
-            maxWidth: 0,     // Will be the maximum of the maximum
+    const transposed = auxMatrix[0].map((col, i) => auxMatrix.map(row => row[i]));
+    const maxReducer = (max, current) =>  current >= max ? current: max ;
+
+    const columns = transposed.map( col => {
+        return {
+            // Maximum of the minimum
+            minWidth: col.map(col => col.minWidth).reduce( maxReducer , 0),
+            // Maximum of the maximum
+            maxWidth: col.map(col => col.maxWidth).reduce( maxReducer , 0),
             width: null,
             d: null
-        };
-        for(let i=0; i < n; i++){
-            const cell = auxMatrix[i][j];
-            // Maximum of the minimum
-            if (cell.minWidth > columns[j].minWidth) {
-                columns[j].minWidth = cell.minWidth;
-            }
-            // Maximum of the maximum
-            if (cell.maxWidth > columns[j].maxWidth) {
-                columns[j].maxWidth = cell.maxWidth;
-            }
         }
-    }
+    });
 
     //Maximum table width is the sum of all the column maximum widths
     const maxTableWidth = columns.map(col => col.maxWidth).reduce((acum, width) => acum + width, 0);
@@ -55,6 +48,7 @@ function autoLayout(tableMatrix, availableTableWidth) {
         col.width = col.minWidth + col.d * W / D;
     });
 
+    // Shrink/stretch to fit all available with
     const totalCalculatedWidth = columns.map(col => col.width).reduce((acum, width) => acum + width, 0);
     columns.forEach(col => {
         col.width = (col.width / totalCalculatedWidth) * A;
