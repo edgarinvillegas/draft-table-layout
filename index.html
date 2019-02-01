@@ -14,12 +14,12 @@
             margin: 0;
             padding: 0;
             border-collapse: collapse;
-            /* width: 200px; */
             white-space:nowrap;
-            /* word-wrap: break-word; */
         }
     </style>
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="getRandomTableMatrix.js"></script>
+    <script src="autoLayout.js"></script>
 </head>
 <body>
     <button onclick="doLayout()">Do layout</button>
@@ -28,82 +28,33 @@
     </table>
 </body>
 <script>
-    const lorem = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
-    const randomWords = lorem.split(' ');
-    function getRandomWords() {
-        //const prob = Math.random();
-        const miu = 5; // 5 words in average
-        const numberOfWords = -Math.log(Math.random())*miu;     // exponential
-        // const numberOfWords = Math.random()*(miu*2);     // uniform
 
-        const ret = [];
-        for(let i = 0; i < numberOfWords; i++){
-            const randomIndex = Math.floor(Math.random()*randomWords.length);
-            ret.push(randomWords[randomIndex]);
-        }
-        //return randomWords.filter(word => Math.random() < n/ ).join(' ');
-        return ret.join(' ');
-    }
 
     const n = 3;
     const m = 5;
 
     const availableTableWidth = 120;
-    const A = availableTableWidth;
-    const charWidth = 8.8;
-    const Awidth = (A*charWidth) + 2*m;   // 2*m due to the borders
+    const charPixelWidth = 8.8;
+    const APixelWidth = (availableTableWidth * charPixelWidth) + 2*m;   // 2*m due to the borders
 
-
-    const tableMatrix = [];
-    (function buildTableMatrix(){
-        for(let i = 0; i < n; i++) {
-            const newRow = [];
-            for(let j = 0; j < m; j++) {
-                const content = getRandomWords();
-                newRow.push({
-                    content
-                });
-            }
-            tableMatrix.push(newRow);
-        }
-    })();
+    const tableMatrix = getRandomTableMatrix(n, m);
 
     (function buildNonWrappedTable(){
         tableMatrix.forEach(row => {
             const newTr$ = $('<tr>');
             row.forEach(cell => {
-                const newTd$ = $(`<td>${cell.content}</td>`);
+                const newTd$ = $(`<td>${cell}</td>`);
                 newTr$.append(newTd$)
             });
             $('#nwtable').append(newTr$);
         })
     })();
 
-
-
-    /*
-    (function buildNonWrappedTable(){
-        for(let i = 0; i < n; i++) {
-            const newTr$ = $('<tr>');
-            const newRow = [];
-            for(let j = 0; j < m; j++) {
-                // const w = A/m;
-                const content = getRandomWords();
-                const newTd$ = $(`<td>${content}</td>`);
-                newTr$.append(newTd$)
-                newRow.push({
-                    content
-                });
-            }
-            $('#nwtable').append(newTr$);
-            tableMatrix.push(newRow);
-        }
-    })();*/
     (function buildBrowserTable(){
         $('body').append('<br/><br/><br/>')
         $('#nwtable').clone().attr('id', 'btable').appendTo('body');
         $('#btable caption h2').text('Browser layout table');
-        $('#btable').width(Awidth);
+        $('#btable').width(APixelWidth);
         $('#btable td').css('white-space', 'normal');
     })();
 
@@ -112,91 +63,17 @@
         $('#nwtable').clone().attr('id', 'mtable').appendTo('body');
         $('#mtable caption h2').text('Manual layout table');
         $('#mtable td').css('white-space', 'normal');
-        $('#mtable tr:first td').width(Awidth/m);
-        $('#mtable').width(Awidth);
+        $('#mtable tr:first td').width(APixelWidth/m);
+        $('#mtable').width(APixelWidth);
     })();
-/*
-let highest = shots.reduce((max, shot) => {
-    return shot.amount >= max.amount ? shot : max;
-}, {
-    // The assumption here is that no amount is lower than a Double-precision float can go.
-    amount: Number.MIN_SAFE_INTEGER
-});
-* */
-
 
     function doLayout() {
-        (function calculateMaxMinWidths(){
-            tableMatrix.forEach(row => {
-                row.forEach(cell => {
-                    //const lines = cell.split()
-                    Object.assign(cell, {
-                        // The minimum width is given by the widest text element
-                        minWidth: cell.content.split(' ').reduce( (maxWord, word) => {
-                            return word.length >= maxWord.length ? word: maxWord
-                        }, '').length,
-                        // The maximum width is given by the widest line
-                        maxWidth: cell.content.length  // TODO: support multiple lines
-                    });
-                });
-            })
-        })();
-        const columns = [];
-        for (let j=0; j < m; j++){
-            columns[j] = {
-                minWidth: 0,    // Will be the maximum of the minimum
-                maxWidth: 0     // Will be the maximum of the maximum
-            };
-            for(let i=0; i < n; i++){
-                const cell = tableMatrix[i][j];
-                // Maximum of the minimum
-                if (cell.minWidth > columns[j].minWidth) {
-                    columns[j].minWidth = cell.minWidth;
-                }
-                // Maximum of the maximum
-                if (cell.maxWidth > columns[j].maxWidth) {
-                    columns[j].maxWidth = cell.maxWidth;
-                }
-            }
-        }
-        // For each column, let d be the difference between maximum and minimum width of that column
-        /*columns.forEach(col => {
-            col.d = col.maxWidth - col.minWidth;
-        })*/
+        const columnWidths = autoLayout(tableMatrix, availableTableWidth);
+        console.log('Widths: ', columnWidths);
+        console.log('Widths in pixels', columnWidths.map(cw => cw * charPixelWidth));
 
-
-        // console.log(tableMatrix);
-        // console.log(columns);
-        //Maximum table width is the sum of all the column maximum widths
-        const maxTableWidth = columns.map(col => col.maxWidth).reduce((acum, width) => acum + width, 0);
-        //Minimum table width is the sum of all the column minimum widths
-        const minTableWidth = columns.map(col => col.minWidth).reduce((acum, width) => acum + width, 0);
-        const W = minTableWidth;
-
-
-
-        const D = A - W;
-
-        // For each column, let d be the difference between maximum and minimum width of that column
-        columns.forEach(col => {
-            col.d = col.maxWidth - col.minWidth;
-        })
-        // Now set the column's width to the minimum width plus d times W over D
-        columns.forEach(col => {
-            col.width = col.minWidth + col.d * W / D;
-        });
-
-        const totalCalculatedWidth = columns.map(col => col.width).reduce((acum, width) => acum + width, 0);
-        columns.forEach(col => {
-            col.width = (col.width / totalCalculatedWidth) * A;
-        });
-
-        console.log('Widths: ', columns);
-
-        console.log('Widths in pixels', columns.map(col => col.width*charWidth));
-
-        columns.forEach((col, j) => {
-            $(`#mtable td:eq(${j})`).width(col.width*charWidth);
+        columnWidths.forEach((cw, j) => {
+            $(`#mtable td:eq(${j})`).width(cw * charPixelWidth);
         });
     }
 </script>
