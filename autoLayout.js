@@ -12,7 +12,7 @@ function autoLayout(tableMatrix, availableTableWidth) {
                 // The minimum width is given by the widest text element
                 minWidth: cell.split(' ').reduce( maxReducer ),
                 // The maximum width is given by the widest line
-                maxWidth: cell.split('\n').reduce( maxReducer )  // TODO: support multiple lines
+                maxWidth: cell.split('\n').reduce( maxReducer )
             }
         })
     });
