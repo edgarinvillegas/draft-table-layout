@@ -1,4 +1,6 @@
 function autoLayout(tableMatrix, availableTableWidth) {
+    const maxReducer = (max, current) =>  current >= max ? current: max ;
+
     // Calculate max and min widths
     const n = tableMatrix.length;
     const m = tableMatrix[0] ? tableMatrix[0].length : 0;
@@ -7,18 +9,17 @@ function autoLayout(tableMatrix, availableTableWidth) {
         return row.map(cell => {
             return {
                 content: cell,
-                minWidth: cell.split(' ').reduce( (maxWord, word) => {
-                    return word.length >= maxWord.length ? word: maxWord
-                }, '').length,
+                // The minimum width is given by the widest text element
+                minWidth: cell.split(' ').reduce( maxReducer ),
                 // The maximum width is given by the widest line
-                maxWidth: cell.length  // TODO: support multiple lines
+                maxWidth: cell.split('\n').reduce( maxReducer )  // TODO: support multiple lines
             }
         })
     });
 
     // Calculate each column's minWidth and maxWidth
     const transposed = auxMatrix[0].map((col, i) => auxMatrix.map(row => row[i]));
-    const maxReducer = (max, current) =>  current >= max ? current: max ;
+
 
     const columns = transposed.map( col => {
         return {
@@ -32,9 +33,10 @@ function autoLayout(tableMatrix, availableTableWidth) {
     });
 
     //Maximum table width is the sum of all the column maximum widths
-    const maxTableWidth = columns.map(col => col.maxWidth).reduce((acum, width) => acum + width, 0);
+    const sumReducer = (acum, width) => acum + width;
+    const maxTableWidth = columns.map(col => col.maxWidth).reduce(sumReducer, 0);
     //Minimum table width is the sum of all the column minimum widths
-    const minTableWidth = columns.map(col => col.minWidth).reduce((acum, width) => acum + width, 0);
+    const minTableWidth = columns.map(col => col.minWidth).reduce(sumReducer, 0);
     const W = minTableWidth;
     const A = availableTableWidth;
     const D = A - W;
