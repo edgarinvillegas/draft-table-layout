@@ -1,5 +1,6 @@
 function autoLayout(tableMatrix, availableTableWidth) {
     const maxReducer = (max, current) =>  current >= max ? current: max ;
+    // const maxLengthReducer = (max, current) =>  current.length >= max.length ? current: max ;
 
     // Calculate max and min widths
     const auxMatrix = tableMatrix.map(row => {
@@ -7,13 +8,12 @@ function autoLayout(tableMatrix, availableTableWidth) {
             return {
                 content: cell,
                 // The minimum width is given by the widest text element
-                minWidth: cell.split(' ').reduce( maxReducer ),
+                minWidth: cell.split(' ').map(w => w.length).reduce( maxReducer, 0 ),
                 // The maximum width is given by the widest line
-                maxWidth: cell.split('\n').reduce( maxReducer )
+                maxWidth: cell.split('\n').map(w => w.length).reduce( maxReducer, 0 )
             }
         })
     });
-
     // Calculate each column's minWidth and maxWidth
     const transposed = auxMatrix[0].map((col, i) => auxMatrix.map(row => row[i]));
 
@@ -29,6 +29,7 @@ function autoLayout(tableMatrix, availableTableWidth) {
 }
 
 function getColumnWidthsByMaxMins(columnMaxMinWidths, availableTableWidth) {
+    console.log({ columnMaxMinWidths });
     //Maximum table width is the sum of all the column maximum widths
     const sumReducer = (acum, width) => acum + width;
     //Minimum table width is the sum of all the column minimum widths
