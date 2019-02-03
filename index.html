@@ -36,14 +36,19 @@
         return min + Math.floor(Math.random() * (max - min + 1));
     }
 
-    const n = riir(1, 6);  //Number of rows
-    const m = riir(1, 10);  //Number of columns
+    function getRandomInputs() {
+        const n = riir(1, 6);  //Number of rows
+        const m = riir(1, 10);  //Number of columns
+        const availableTableWidth = riir(80, 140);
+        return { n, m, availableTableWidth };
+    }
 
-    const availableTableWidth = riir(80, 140);
+
+    const inputs = getRandomInputs();
+    const tableMatrix = getRandomTableMatrix(inputs.n, inputs.m);
+
     const charPixelWidth = 8.8;
-    const APixelWidth = (availableTableWidth * charPixelWidth) + 2*m;   // 2*m due to the borders
-
-    const tableMatrix = getRandomTableMatrix(n, m);
+    const APixelWidth = (inputs.availableTableWidth * charPixelWidth) + 2 * inputs.m;   // 2*m due to the borders
 
     (function buildBrowserTable(){
         tableMatrix[0].forEach(cell => {
@@ -58,6 +63,8 @@
             $('#browserTable tbody').append(newTr$);
         });
         $('#browserTable').width(APixelWidth);
+        const autoBrowserWidths = $('#browserTable tr:first td').map( (i, el) => $(el).width() ).get();
+        console.log({ autoBrowserWidths });
     })();
 
     function buildManualLayoutTable(){
@@ -65,14 +72,13 @@
         $('#browserTable').clone().attr('id', 'manualTable').appendTo('body');
         $('#manualTable caption h2').text('Manual layout table');
         $('#manualTable td').css('white-space', 'normal');
-        // $('#manualTable tr:first td').width(APixelWidth/m);
-        $('#manualTable colgroup col').width(APixelWidth/m);
-        $('#manualTable').width(APixelWidth);
+        $('#manualTable colgroup col').width(APixelWidth/inputs.m);
+        // $('#manualTable').width(APixelWidth);
         $('#btnLayout').show();
     };
 
     function doLayout() {
-        const columnWidths = autoLayout(tableMatrix, availableTableWidth);
+        const columnWidths = autoLayout(tableMatrix, inputs.availableTableWidth);
         console.log('Widths: ', columnWidths);
         console.log('Widths in pixels', columnWidths.map(cw => cw * charPixelWidth));
         columnWidths.forEach((cw, j) => {
