@@ -14,7 +14,6 @@
             margin: 0;
             padding: 0;
             border-collapse: collapse;
-            white-space:nowrap;
         }
     </style>
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
@@ -22,10 +21,12 @@
     <script src="autoLayout.js"></script>
 </head>
 <body>
-    <button onclick="doLayout()">Do layout</button>
-    <table id="nwtable" contenteditable  cellspacing="0" cellpadding="0">
-        <caption><h2>Non wrapped table</h2></caption>
+    <button onclick="buildManualLayoutTable()">Copy table without layout</button>
+    <table id="browserTable" contenteditable  cellspacing="0" cellpadding="0">
+        <caption><h2>Automatic Browser Layout</h2></caption>
     </table>
+    <br/><br/><br/>
+    <button id="btnLayout" onclick="doLayout()" style="display:none">Do layout</button>
 </body>
 <script>
 
@@ -39,41 +40,34 @@
 
     const tableMatrix = getRandomTableMatrix(n, m);
 
-    (function buildNonWrappedTable(){
+    (function buildBrowserTable(){
         tableMatrix.forEach(row => {
             const newTr$ = $('<tr>');
             row.forEach(cell => {
                 const newTd$ = $(`<td>${cell}</td>`);
                 newTr$.append(newTd$)
             });
-            $('#nwtable').append(newTr$);
+            $('#browserTable').append(newTr$);
         })
+        $('#browserTable').width(APixelWidth);
     })();
 
-    (function buildBrowserTable(){
-        $('body').append('<br/><br/><br/>')
-        $('#nwtable').clone().attr('id', 'btable').appendTo('body');
-        $('#btable caption h2').text('Browser layout table');
-        $('#btable').width(APixelWidth);
-        $('#btable td').css('white-space', 'normal');
-    })();
-
-    (function buildManualLayoutTable(){
-        $('body').append('<br/><br/><br/>')
-        $('#nwtable').clone().attr('id', 'mtable').appendTo('body');
-        $('#mtable caption h2').text('Manual layout table');
-        $('#mtable td').css('white-space', 'normal');
-        $('#mtable tr:first td').width(APixelWidth/m);
-        $('#mtable').width(APixelWidth);
-    })();
+    function buildManualLayoutTable(){
+        $('#manualTable').remove();
+        $('#browserTable').clone().attr('id', 'manualTable').appendTo('body');
+        $('#manualTable caption h2').text('Manual layout table');
+        $('#manualTable td').css('white-space', 'normal');
+        $('#manualTable tr:first td').width(APixelWidth/m);
+        $('#manualTable').width(APixelWidth);
+        $('#btnLayout').show();
+    };
 
     function doLayout() {
         const columnWidths = autoLayout(tableMatrix, availableTableWidth);
         console.log('Widths: ', columnWidths);
         console.log('Widths in pixels', columnWidths.map(cw => cw * charPixelWidth));
-
         columnWidths.forEach((cw, j) => {
-            $(`#mtable td:eq(${j})`).width(cw * charPixelWidth);
+            $(`#manualTable td:eq(${j})`).width(cw * charPixelWidth);
         });
     }
 </script>
