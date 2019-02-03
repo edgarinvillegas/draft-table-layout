@@ -6,15 +6,13 @@ function getRandomTableMatrix(n, m) {
     }
     function getRandomWords(miu) {
         if(Math.random() < 0.2) return '';
-        const numberOfWords = getRandomExp(miu);     // exponential
+        const numberOfWords = Math.round(getRandomExp(miu));     // exponential
         // const numberOfWords = Math.random()*(miu*2);     // uniform
-        const ret = [];
-        for(let i = 0; i < numberOfWords; i++){
+        // We take numberOfWords words randomly
+        return new Array(numberOfWords).fill(null).map(() => {
             const randomIndex = Math.floor(Math.random()*randomWords.length);
-            ret.push(randomWords[randomIndex]);
-        }
-        //return randomWords.filter(word => Math.random() < n/ ).join(' ');
-        return ret.join(' ');
+            return randomWords[randomIndex];
+        }).join(' ');
     }
 
     function getTableMatrix(){
@@ -29,6 +27,5 @@ function getRandomTableMatrix(n, m) {
         }
         return tableMatrix;
     }
-
     return getTableMatrix();
 }
