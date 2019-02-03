@@ -30,14 +30,14 @@
 </body>
 <script>
     //stands for 'Random integer in range'
-    function riir(min, almostMax) {
-        return min + Math.floor(Math.random() * (almostMax - min));
+    function riir(min, max) {
+        return min + Math.floor(Math.random() * (max - min + 1));
     }
 
     const n = riir(1, 6);  //Number of rows
     const m = riir(1, 10);  //Number of columns
 
-    const availableTableWidth = 120;
+    const availableTableWidth = riir(80, 140);
     const charPixelWidth = 8.8;
     const APixelWidth = (availableTableWidth * charPixelWidth) + 2*m;   // 2*m due to the borders
 
