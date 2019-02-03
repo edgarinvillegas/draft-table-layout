@@ -17,17 +17,21 @@ function getRandomTableMatrix(n, m) {
     }
 
     function getTableMatrix(){
-        const tableMatrix = [];
-        for(let i = 0; i < n; i++) {
-            const newRow = [];
-            for(let j = 0; j < m; j++) {
+        // Initialize n x m matrix with Xs
+        const tableMatrix = 'R'.repeat(n).split('').map(
+            () => 'X'.repeat(m).split('')
+        );
+        console.log(tableMatrix);
+        for(let j = 0; j < m; j++) {
+            for(let i = 0; i < n; i++) {
                 const content = getRandomWords();
-                newRow.push(content);
+                tableMatrix[i][j] = content;
             }
-            tableMatrix.push(newRow);
         }
+        console.log(tableMatrix);
         return tableMatrix;
     }
+
 
     return getTableMatrix();
 }
