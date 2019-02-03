@@ -24,6 +24,8 @@
     <button onclick="buildManualLayoutTable()">Copy table without layout</button>
     <table id="browserTable" contenteditable  cellspacing="0" cellpadding="0">
         <caption><h2>Automatic Browser Layout</h2></caption>
+        <colgroup></colgroup>
+        <tbody></tbody>
     </table>
     <br/><br/><br/>
     <button id="btnLayout" onclick="doLayout()" style="display:none">Do layout</button>
@@ -44,14 +46,17 @@
     const tableMatrix = getRandomTableMatrix(n, m);
 
     (function buildBrowserTable(){
+        tableMatrix[0].forEach(cell => {
+            $('#browserTable colgroup').append('<col/>');
+        });
         tableMatrix.forEach(row => {
             const newTr$ = $('<tr>');
             row.forEach(cell => {
                 const newTd$ = $(`<td>${cell}</td>`);
                 newTr$.append(newTd$)
             });
-            $('#browserTable').append(newTr$);
-        })
+            $('#browserTable tbody').append(newTr$);
+        });
         $('#browserTable').width(APixelWidth);
     })();
 
@@ -60,7 +65,8 @@
         $('#browserTable').clone().attr('id', 'manualTable').appendTo('body');
         $('#manualTable caption h2').text('Manual layout table');
         $('#manualTable td').css('white-space', 'normal');
-        $('#manualTable tr:first td').width(APixelWidth/m);
+        // $('#manualTable tr:first td').width(APixelWidth/m);
+        $('#manualTable colgroup col').width(APixelWidth/m);
         $('#manualTable').width(APixelWidth);
         $('#btnLayout').show();
     };
@@ -70,7 +76,7 @@
         console.log('Widths: ', columnWidths);
         console.log('Widths in pixels', columnWidths.map(cw => cw * charPixelWidth));
         columnWidths.forEach((cw, j) => {
-            $(`#manualTable td:eq(${j})`).width(cw * charPixelWidth);
+            $(`#manualTable colgroup col:eq(${j})`).width(cw * charPixelWidth);
         });
     }
 </script>
