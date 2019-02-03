@@ -18,10 +18,8 @@ function getRandomTableMatrix(n, m) {
     }
 
     function getTableMatrix(){
-        // Initialize n x m matrix with Xs
-        const tableMatrix = 'R'.repeat(n).split('').map(
-            () => 'X'.repeat(m).split('')
-        );
+        // Initialize n x m matrix
+        const tableMatrix = new Array(n).fill(null).map( () => new Array(m));
         for(let j = 0; j < m; j++) {
             const colAvgWidth = Math.random()*10;
             for(let i = 0; i < n; i++) {
