@@ -21,14 +21,12 @@ function getRandomTableMatrix(n, m) {
         const tableMatrix = 'R'.repeat(n).split('').map(
             () => 'X'.repeat(m).split('')
         );
-        console.log(tableMatrix);
         for(let j = 0; j < m; j++) {
             for(let i = 0; i < n; i++) {
                 const content = getRandomWords();
                 tableMatrix[i][j] = content;
             }
         }
-        console.log(tableMatrix);
         return tableMatrix;
     }
 

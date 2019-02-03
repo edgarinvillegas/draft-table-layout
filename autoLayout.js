@@ -29,7 +29,6 @@ function autoLayout(tableMatrix, availableTableWidth) {
 }
 
 function getColumnWidthsByMaxMins(columnMaxMinWidths, availableTableWidth) {
-    console.log({ columnMaxMinWidths });
     //Maximum table width is the sum of all the column maximum widths
     const sumReducer = (acum, width) => acum + width;
     //Minimum table width is the sum of all the column minimum widths
