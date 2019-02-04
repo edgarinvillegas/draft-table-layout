@@ -1,8 +1,10 @@
 import fs from 'fs';
 // import trainingData from './trainingData/trainingFromAlgorithm01.mjs';
+// import trainingData from './trainingData/trainingFromBrowser01';
+import trainingData from './trainingData/trainingData-default';
 import brain from 'brain.js'
-import trainingData from './trainingData/trainingFromBrowser01';
-import TableLayoutMLModel from './TableLayoutMLModel.mjs';
+import TableLayoutMLModel from './TableLayoutMLModel';
+
 /*
 const net = new brain.NeuralNetwork({ hiddenLayers: [3] });
 const trainingData = [
@@ -16,6 +18,7 @@ console.log(net.run([0, 0]));
 */
 
 const model = new TableLayoutMLModel(brain);
+
 model.train(trainingData);
 
 function saveModel() {
