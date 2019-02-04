@@ -10,7 +10,7 @@ class TableLayoutMLModel {
             this.net = new brain.NeuralNetwork();
             this.import(json);
         } else {
-            this.net = new brain.NeuralNetwork({ hiddenLayers: [7] });
+            this.net = new brain.NeuralNetwork({ hiddenLayers: [8, 6] });
         }
     }
     normalizeTrainingData(trainingData) {
@@ -23,7 +23,7 @@ class TableLayoutMLModel {
         const normalizedTrainingData = this.normalizeTrainingData(trainingData);
         this.net.train(normalizedTrainingData, {
             log: (data) => console.log(data),
-            iterations: 200
+            iterations: 1000
         });
     }
     predict(subjectInput) {
