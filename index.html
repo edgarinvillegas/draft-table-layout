@@ -36,8 +36,13 @@
         <div>
             <button id="btnNewSample">Generate new table</button>
         </div>
-        <button id="btnStartLearning">Start learning</button>
-        <button id="btnStopLearning" disabled>Stop learning</button>
+        <div>
+            <button id="btnStartLearning">Start learning</button>
+            <button id="btnStopLearning" disabled>Stop learning</button>
+        </div>
+        <div>
+            <button id="btnNewSampleAndML"> >> Generate new table & layout with ML </button>
+        </div>
         <!-- Table will come here -->
     </div>
     <div id="manualTableContainer" class="container" style="display:none">
@@ -190,6 +195,12 @@
     }
     document.getElementById('btnNewSample').onclick = generateRandomTable;
     generateRandomTable();
+
+    document.getElementById('btnNewSampleAndML').onclick = function(){
+        document.getElementById('btnNewSample').onclick();
+        document.getElementById('btnCopyBrowserTableForML').onclick();
+        document.getElementById('btnLayoutML').onclick();
+    };
 
     let interval = null;
     function startLearning() {
