@@ -4,6 +4,11 @@ https://www.w3.org/TR/REC-html40/appendix/notes.html#h-B.5.2
 */
 
 function autoLayout(tableMatrix, availableTableWidth) {
+    const columnMaxMinWidths = getColumnMaxMinWidths(tableMatrix);
+    return getColumnWidthsByMaxMins(columnMaxMinWidths, availableTableWidth);
+}
+
+function getColumnMaxMinWidths(tableMatrix) {
     const maxReducer = (max, current) =>  current >= max ? current: max ;
     // Calculate max and min widths
     const auxMatrix = tableMatrix.map(row => {
@@ -28,7 +33,7 @@ function autoLayout(tableMatrix, availableTableWidth) {
             maxWidth: col.map(col => col.maxWidth).reduce( maxReducer , 0),
         }
     });
-    return getColumnWidthsByMaxMins(columnMaxMinWidths, availableTableWidth);
+    return columnMaxMinWidths;
 }
 
 function getColumnWidthsByMaxMins(columnMaxMinWidths, availableTableWidth) {
