@@ -5,10 +5,14 @@
     <title>HTML Layout playground</title>
     <style>
         table {
-            font-family: Consolas;
+            font-family: monospace;
+            font-size: 15.95px; /* This makes the width to be almost exactly 10px */
+        }
+        #prototypeTable {
+            display: none;
         }
         td {
-            border-width: 1px;
+            /* border-width will be set at runtime*/
             border-style: solid;
             border-color: black;
             margin: 0;
@@ -21,14 +25,15 @@
     <script src="autoLayout.js"></script>
 </head>
 <body>
-    <button onclick="buildManualLayoutTable()">Copy table without layout</button>
-    <table id="browserTable" contenteditable  cellspacing="0" cellpadding="0">
+    <table id="prototypeTable" contenteditable  cellspacing="0" cellpadding="0">
         <caption><h2>Automatic Browser Layout</h2></caption>
         <colgroup></colgroup>
         <tbody></tbody>
     </table>
-    <br/><br/><br/>
+    <button onclick="buildManualLayoutTable()">Copy table without layout</button>
+    <div id="browserTableContainer"></div>
     <button id="btnLayout" onclick="doLayout()" style="display:none">Do layout</button>
+    <div id="manualTableContainer"></div>
 </body>
 <script>
     //stands for 'Random integer in range'
@@ -37,52 +42,65 @@
     }
 
     function getRandomInputs() {
+        /*return {
+            n: 1,
+            m: 1,
+            availableTableWidth: 100
+        };*/
         const n = riir(1, 6);  //Number of rows
         const m = riir(1, 10);  //Number of columns
         const availableTableWidth = riir(80, 140);
         return { n, m, availableTableWidth };
     }
 
-
     const inputs = getRandomInputs();
     const tableMatrix = getRandomTableMatrix(inputs.n, inputs.m);
 
     const charPixelWidth = 8.8;
-    const APixelWidth = (inputs.availableTableWidth * charPixelWidth) + 2 * inputs.m;   // 2*m due to the borders
+    const CELL_BORDER_WIDTH = 1;    //
+    const APixelWidth = (inputs.availableTableWidth * charPixelWidth) + CELL_BORDER_WIDTH * 2 * inputs.m;
 
-    (function buildBrowserTable(){
+    function createTableFromMatrix(tableMatrix, id, containerSelector, width = null) {
+        $(`#${id}`).remove();
+        const $newTable = $('#prototypeTable').clone().attr('id', id).appendTo(containerSelector);
         tableMatrix[0].forEach(cell => {
-            $('#browserTable colgroup').append('<col/>');
+            $newTable.find(`colgroup`).append('<col/>');
         });
         tableMatrix.forEach(row => {
             const newTr$ = $('<tr>');
             row.forEach(cell => {
                 const newTd$ = $(`<td>${cell}</td>`);
+                newTd$.css('border-width', CELL_BORDER_WIDTH);
                 newTr$.append(newTd$)
             });
-            $('#browserTable tbody').append(newTr$);
+            $newTable.find('tbody').append(newTr$);
         });
-        $('#browserTable').width(APixelWidth);
-        const autoBrowserWidths = $('#browserTable tr:first td').map( (i, el) => $(el).width() ).get();
-        console.log({ autoBrowserWidths });
-    })();
+        if(width !== null) {
+            $newTable.width(width);
+        }
+        console.log('table created, id: ', id);
+    }
 
-    function buildManualLayoutTable(){
-        $('#manualTable').remove();
-        $('#browserTable').clone().attr('id', 'manualTable').appendTo('body');
-        $('#manualTable caption h2').text('Manual layout table');
-        $('#manualTable td').css('white-space', 'normal');
+    createTableFromMatrix(tableMatrix, 'browserTable', '#browserTableContainer', APixelWidth);
+    const autoBrowserWidths = $('#browserTable tr:first td').map( (i, el) => $(el).width() ).get();
+    console.log({ autoBrowserWidths });
+
+    function buildManualLayoutTable() {
+        createTableFromMatrix(tableMatrix, 'manualTable', '#manualTableContainer');
+        $('#manualTable caption h2').text('Manual (algorithm) layout');
         $('#manualTable colgroup col').width(APixelWidth/inputs.m);
-        // $('#manualTable').width(APixelWidth);
         $('#btnLayout').show();
-    };
+    }
+    buildManualLayoutTable();
 
     function doLayout() {
         const columnWidths = autoLayout(tableMatrix, inputs.availableTableWidth);
         console.log('Widths: ', columnWidths);
         console.log('Widths in pixels', columnWidths.map(cw => cw * charPixelWidth));
+        console.log('Total width: ', columnWidths.reduce((acum, curr) => acum + curr, 0));
+        console.log('Total width in pixels: ', columnWidths.map(cw => cw * charPixelWidth).reduce((acum, curr) => acum + curr, 0));
         columnWidths.forEach((cw, j) => {
-            $(`#manualTable colgroup col:eq(${j})`).width(cw * charPixelWidth);
+            $(`#manualTable colgroup col:eq(${j})`).width(cw * charPixelWidth + CELL_BORDER_WIDTH * 2);
         });
     }
 </script>
