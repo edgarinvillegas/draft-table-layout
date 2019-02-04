@@ -19,16 +19,18 @@ function getRandomInputs() {
 }
 
 function main() {
-    const inputs = getRandomInputs();
-    const tableMatrix = getRandomTableMatrix(inputs.n, inputs.m);
-    const columnMaxMinWidths = getColumnMaxMinWidths(tableMatrix);
-    const output = getColumnWidthsByMaxMins(columnMaxMinWidths, inputs.availableTableWidth);
-    console.log(columnMaxMinWidths);
-    const dataToLog = {
-        input: columnMaxMinWidths.map(col => [col.minWidth, col.maxWidth]).reduce((acc, val) => acc.concat(val), []),
-        output: output.map( cw => cw.toFixed(2))
-    };
-    console.log(`${JSON.stringify(dataToLog)}`);
+    for(let i=0; i<10; i++) {
+        const inputs = getRandomInputs();
+        const tableMatrix = getRandomTableMatrix(inputs.n, inputs.m);
+        const columnMaxMinWidths = getColumnMaxMinWidths(tableMatrix);
+        const output = getColumnWidthsByMaxMins(columnMaxMinWidths, inputs.availableTableWidth);
+        // console.log(columnMaxMinWidths);
+        const dataToLog = {
+            input: columnMaxMinWidths.map(col => [col.minWidth, col.maxWidth]).reduce((acc, val) => acc.concat(val), []),
+            output: output.map( cw => Number(cw.toFixed(2)))
+        };
+        console.log(`${JSON.stringify(dataToLog)},`);
+    }
 }
 
 main();
