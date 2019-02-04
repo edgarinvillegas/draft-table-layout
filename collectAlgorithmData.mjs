@@ -19,7 +19,7 @@ function getRandomInputs() {
 }
 
 function main() {
-    for(let i=0; i<10; i++) {
+    for(let i=0; i<10000; i++) {
         const inputs = getRandomInputs();
         const tableMatrix = getRandomTableMatrix(inputs.n, inputs.m);
         const columnMaxMinWidths = getColumnMaxMinWidths(tableMatrix);

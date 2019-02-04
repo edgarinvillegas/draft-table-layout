@@ -38,7 +38,12 @@
     </div>
     <div id="manualTableContainer" class="container">
         <button id="btnCopyBrowserTable">Copy table without layout</button>
-        <button id="btnLayout" style="display:none">Do layout</button>
+        <button id="btnLayout" style="display:none">Do layout (Algorithm)</button>
+        <!-- Table will come here -->
+    </div>
+    <div id="mlTableContainer" class="container">
+        <button id="btnCopyBrowserTableForML">Copy table without layout for ML</button>
+        <button id="btnLayoutML" style="display:none">Do layout (ML)</button>
         <!-- Table will come here -->
     </div>
 </body>
@@ -52,11 +57,11 @@
     }
 
     function getRandomInputs() {
-        /*return {
-            n: 1,
-            m: 1,
+        return {
+            n: riir(1, 6),
+            m: 5,
             availableTableWidth: 100
-        };*/
+        };
         const n = riir(1, 6);  //Number of rows
         const m = riir(1, 10);  //Number of columns
         const availableTableWidth = riir(80, 140);
@@ -92,11 +97,16 @@
     function learn(){
         const inputs = getRandomInputs();
         const tableMatrix = getRandomTableMatrix(inputs.n, inputs.m);
+        console.log('tableMatrix: ', JSON.stringify(tableMatrix));
 
         const columnMaxMinWidths = getColumnMaxMinWidths(tableMatrix);
 
         const AvailablePixelContentWidth = (inputs.availableTableWidth * charPixelWidth)
         const AvailablePixelWidth = AvailablePixelContentWidth + CELL_BORDER_WIDTH * 2 * inputs.m;
+
+        // Log input in NN format
+        const dataToLog = columnMaxMinWidths.map(col => [col.minWidth, col.maxWidth]).reduce((acc, val) => acc.concat(val), []);
+        console.log(`input: ${JSON.stringify(dataToLog)}`);
 
         (function createAutomaticBrowserTable(){
             createTableFromMatrix(tableMatrix, 'browserTable', '#browserTableContainer', 'Automatic Browser Layout', AvailablePixelWidth);
@@ -123,18 +133,33 @@
         }
         document.getElementById('btnCopyBrowserTable').onclick = buildManualLayoutTable;
 
+        function buildMLLayoutTable() {
+            createTableFromMatrix(tableMatrix, 'mlTable', '#mlTableContainer', 'Manual (ML) layout');
+            $('#mlTable colgroup col').width(AvailablePixelWidth/inputs.m);
+            $('#btnLayoutML').show();
+        }
+        document.getElementById('btnCopyBrowserTableForML').onclick = buildMLLayoutTable;
+
         function doLayout() {
             const columnWidths = getColumnWidthsByMaxMins(columnMaxMinWidths, inputs.availableTableWidth);
-            // const columnWidths = autoLayout(tableMatrix, inputs.availableTableWidth);
-            console.log('Widths: ', columnWidths);
+            /*console.log('Widths: ', columnWidths);
             console.log('Widths in pixels', columnWidths.map(cw => cw * charPixelWidth));
             console.log('Total width: ', columnWidths.reduce((acum, curr) => acum + curr, 0));
             console.log('Total width in pixels: ', columnWidths.map(cw => cw * charPixelWidth).reduce((acum, curr) => acum + curr, 0));
+            */
             columnWidths.forEach((cw, j) => {
                 $(`#manualTable colgroup col:eq(${j})`).width(columnWidthToPixels(cw) + CELL_BORDER_WIDTH * 2 );
             });
         }
         document.getElementById('btnLayout').onclick = doLayout;
+
+        function doLayoutML() {
+            let columnWidths = [];
+            columnWidths.forEach((cw, j) => {
+                $(`#mlTable colgroup col:eq(${j})`).width(columnWidthToPixels(cw) + CELL_BORDER_WIDTH * 2 );
+            });
+        }
+        document.getElementById('btnLayoutML').onclick = doLayoutML;
     }
     learn();
 
