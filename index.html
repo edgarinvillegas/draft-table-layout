@@ -19,6 +19,9 @@
             padding: 0;
             border-collapse: collapse;
         }
+        .container {
+            margin-bottom: 20px;
+        }
     </style>
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
     <script src="getRandomTableMatrix.js"></script>
@@ -30,10 +33,15 @@
         <colgroup></colgroup>
         <tbody></tbody>
     </table>
-    <button onclick="buildManualLayoutTable()">Copy table without layout</button>
-    <div id="browserTableContainer"></div>
-    <button id="btnLayout" onclick="doLayout()" style="display:none">Do layout</button>
-    <div id="manualTableContainer"></div>
+    <div id="browserTableContainer" class="container">
+        <button onclick="buildManualLayoutTable()">Copy table without layout</button>
+        <!-- Table will come here -->
+    </div>
+
+    <div id="manualTableContainer" class="container">
+        <button id="btnLayout" onclick="doLayout()" style="display:none">Do layout</button>
+        <!-- Table will come here -->
+    </div>
 </body>
 <script>
     //stands for 'Random integer in range'
