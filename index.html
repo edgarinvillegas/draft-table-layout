@@ -22,6 +22,14 @@
         .container {
             margin-bottom: 20px;
         }
+        .buttonContainer {
+            display: flex;
+            flex-direction: row;
+            width: 800px;
+        }
+        .buttonGroup {
+            flex: 1;
+        }
     </style>
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
     <script src="node_modules/brain.js/browser.min.js"></script>
@@ -33,15 +41,17 @@
         <tbody></tbody>
     </table>
     <div id="browserTableContainer" class="container">
-        <div>
-            <button id="btnNewSample">Generate new table</button>
-        </div>
-        <div>
-            <button id="btnStartLearning">Start learning</button>
-            <button id="btnStopLearning" disabled>Stop learning</button>
-        </div>
-        <div>
-            <button id="btnNewSampleAndML"> >> Generate new table & layout with ML </button>
+        <div class="buttonContainer">
+            <div class="buttonGroup">
+                <button id="btnNewSample">Generate new table</button>
+            </div>
+            <div class="buttonGroup">
+                <button id="btnNewSampleAndML"> >> Generate new table & layout with ML </button>
+            </div>
+            <div class="buttonGroup">
+                <button id="btnStartLearning">Start learning</button>
+                <button id="btnStopLearning" disabled>Stop learning</button>
+            </div>
         </div>
         <!-- Table will come here -->
     </div>
@@ -144,6 +154,7 @@
                 trainingData.push(trainingEntry);
             }
         })();
+        $('#manualTable, #mlTable').hide();
 
         // Rest of this method is for user-triggered events (not related to learning from browser)
 
@@ -181,7 +192,7 @@
 
         function doLayoutML() {
             $('#mlTable').width($('#browserTable').width());
-            let columnWidths = trainingData.length
+            let columnWidths = mlModel.isTrained()
                 ? getColumnWidthsMLByMemoryModel(mlModel, columnMaxMinWidths, inputs.availableTableWidth)
                 : getColumnWidthsML(columnMaxMinWidths, inputs.availableTableWidth)
             ;
