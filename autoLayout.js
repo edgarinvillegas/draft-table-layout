@@ -5,17 +5,15 @@ https://www.w3.org/TR/REC-html40/appendix/notes.html#h-B.5.2
 
 function autoLayout(tableMatrix, availableTableWidth) {
     const maxReducer = (max, current) =>  current >= max ? current: max ;
-    // const maxLengthReducer = (max, current) =>  current.length >= max.length ? current: max ;
-
     // Calculate max and min widths
     const auxMatrix = tableMatrix.map(row => {
         return row.map(cell => {
             return {
                 content: cell,
                 // The minimum width is given by the widest text element
-                minWidth: cell.split(' ').map(w => w.length).reduce( maxReducer, 0 ),
+                minWidth: cell.split(' ').map(word => word.length).reduce( maxReducer, 0 ),
                 // The maximum width is given by the widest line
-                maxWidth: cell.split('\n').map(l => l.length).reduce( maxReducer, 0 )
+                maxWidth: cell.split('\n').map(line => line.length).reduce( maxReducer, 0 )
             }
         })
     });
@@ -63,10 +61,6 @@ function getColumnWidthsByMaxMins(columnMaxMinWidths, availableTableWidth) {
             // Now set the column's width to the minimum width plus d times W over D
             return col.minWidth + d * W / D;
         });
-        // Shrink/stretch to fit all available with (step added by me)
-        // const totalCalculatedWidth = colWidths.reduce(sumReducer, 0);
-        // return colWidths.map(cw => (cw / totalCalculatedWidth) * A);
-        // return colWidths;
         return colWidths;
     }
 }
