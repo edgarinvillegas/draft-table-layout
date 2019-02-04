@@ -53,8 +53,9 @@
 </body>
 <script type="module">
     import { getColumnMaxMinWidths, getColumnWidthsByMaxMins } from './autoLayout.mjs';
-    import { getColumnWidthsML } from './autoLayoutML.mjs';
+    import { getColumnWidthsML, getColumnWidthsMLByMemoryModel } from './autoLayoutML.mjs';
     import { getRandomTableMatrix } from './getRandomTableMatrix.mjs';
+    import TableLayoutMLModel from './TableLayoutMLModel.mjs';
 
     //stands for 'Random integer in range'
     function riir(min, max) {
@@ -99,8 +100,12 @@
 
     const columnWidthToPixels = cw => cw * charPixelWidth;
 
+
+    const mlModel = new TableLayoutMLModel(brain);
+    const trainingData = [];
+
     let learnCounter = 10000;
-    function learn(){
+    function generateRandomTable(learn = false){
         const inputs = getRandomInputs();
         const tableMatrix = getRandomTableMatrix(inputs.n, inputs.m);
         // console.log('tableMatrix: ', JSON.stringify(tableMatrix));
@@ -117,18 +122,22 @@
                 minWidth: columnWidthToPixels(col.minWidth).toFixed(2),
                 maxWidth: columnWidthToPixels(col.maxWidth).toFixed(2)
             }));
-            // This is logs the inputs and outputs
-            /*const dataToLog = {
-                tableWidth: AvailablePixelContentWidth.toFixed(2),
-                maxMinWidths: columnPixelMaxMinWidths,
-                output: autoBrowserPixelWidths
-            };
-            */
-            const dataToLog = {
-                input: columnMaxMinWidths.map(col => [col.minWidth, col.maxWidth]).reduce((acc, val) => acc.concat(val), []),
-                output: autoBrowserPixelWidths.map(cpw => cpw/charPixelWidth).map( cw => Number(cw.toFixed(2)))
-            };
-            console.log(`${JSON.stringify(dataToLog)},`);
+
+            if(learn) {
+                // This is logs the inputs and outputs
+                /*const dataToLog = {
+                    tableWidth: AvailablePixelContentWidth.toFixed(2),
+                    maxMinWidths: columnPixelMaxMinWidths,
+                    output: autoBrowserPixelWidths
+                };
+                */
+                const trainingEntry = {
+                    input: columnMaxMinWidths.map(col => [col.minWidth, col.maxWidth]).reduce((acc, val) => acc.concat(val), []),
+                    output: autoBrowserPixelWidths.map(cpw => cpw/charPixelWidth).map( cw => Number(cw.toFixed(2)))
+                };
+                console.log(`${JSON.stringify(trainingEntry)},`);
+                trainingData.push(trainingEntry);
+            }
         })();
 
         // Rest of this method is for user-triggered events (not related to learning from browser)
@@ -167,7 +176,10 @@
 
         function doLayoutML() {
             $('#mlTable').width($('#browserTable').width());
-            let columnWidths = getColumnWidthsML(columnMaxMinWidths, inputs.availableTableWidth);
+            let columnWidths = trainingData.length
+                ? getColumnWidthsMLByMemoryModel(mlModel, columnMaxMinWidths, inputs.availableTableWidth)
+                : getColumnWidthsML(columnMaxMinWidths, inputs.availableTableWidth)
+            ;
             columnWidths.forEach((cw, j) => {
                 $(`#mlTable colgroup col:eq(${j})`).width(columnWidthToPixels(cw) + CELL_BORDER_WIDTH * 2 );
             });
@@ -176,22 +188,28 @@
         document.getElementById('btnLayoutML').onclick = doLayoutML;
         if(--learnCounter == 0) stopLearning();
     }
-    document.getElementById('btnNewSample').onclick = learn;
-    learn();
+    document.getElementById('btnNewSample').onclick = generateRandomTable;
+    generateRandomTable();
 
     let interval = null;
     function startLearning() {
-        stopLearning();
-        interval = setInterval(learn, 100);
+        clearInterval(interval);
+        interval = setInterval(() => generateRandomTable(true), 100);
         reflectLearningStatusInView(true);
     }
     function stopLearning() {
         clearInterval(interval);
         reflectLearningStatusInView(false);
+        $('#btnLayoutML').prop('disabled', true);
+        mlModel.train(trainingData);
+        $('#btnLayoutML').prop('disabled', false);
+        console.log('Training done. You can click "Do layout (ML) button"');
     }
     function reflectLearningStatusInView(isLearning){
         $('#btnStartLearning').prop('disabled', isLearning);
+        $('#btnLayoutML').prop('disabled', isLearning);
         $('#btnStopLearning').prop('disabled', !isLearning);
+        $('#btnNewSample').prop('disabled', isLearning);
     }
 
     $('#btnStartLearning').click(startLearning);
