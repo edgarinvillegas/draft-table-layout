@@ -32,13 +32,12 @@
         <tbody></tbody>
     </table>
     <div id="browserTableContainer" class="container">
-        <button id="btnCopyBrowserTable">Copy table without layout</button>
         <button id="btnStartLearning">Start learning</button>
         <button id="btnStopLearning" disabled>Stop learning</button>
         <!-- Table will come here -->
     </div>
-
     <div id="manualTableContainer" class="container">
+        <button id="btnCopyBrowserTable">Copy table without layout</button>
         <button id="btnLayout" style="display:none">Do layout</button>
         <!-- Table will come here -->
     </div>
@@ -84,7 +83,7 @@
         }
     }
 
-    const charPixelWidth = 8.8;
+    const charPixelWidth = 10;
     const CELL_BORDER_WIDTH = 1;    //
 
     const columnWidthToPixels = cw => cw * charPixelWidth;
@@ -132,7 +131,7 @@
             console.log('Total width: ', columnWidths.reduce((acum, curr) => acum + curr, 0));
             console.log('Total width in pixels: ', columnWidths.map(cw => cw * charPixelWidth).reduce((acum, curr) => acum + curr, 0));
             columnWidths.forEach((cw, j) => {
-                $(`#manualTable colgroup col:eq(${j})`).width(cw => columnWidthToPixels(cw) + CELL_BORDER_WIDTH * 2 );
+                $(`#manualTable colgroup col:eq(${j})`).width(columnWidthToPixels(cw) + CELL_BORDER_WIDTH * 2 );
             });
         }
         document.getElementById('btnLayout').onclick = doLayout;
