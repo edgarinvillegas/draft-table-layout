@@ -27,7 +27,7 @@
 </head>
 <body>
     <table id="prototypeTable" contenteditable  cellspacing="0" cellpadding="0">
-        <caption><h2>Automatic Browser Layout</h2></caption>
+        <caption><h2>Table title</h2></caption>
         <colgroup></colgroup>
         <tbody></tbody>
     </table>
@@ -43,8 +43,8 @@
     </div>
 </body>
 <script type="module">
-    import { getColumnMaxMinWidths, getColumnWidthsByMaxMins } from './autoLayout.js';
-    import { getRandomTableMatrix } from './getRandomTableMatrix.js';
+    import { getColumnMaxMinWidths, getColumnWidthsByMaxMins } from './autoLayout.mjs';
+    import { getRandomTableMatrix } from './getRandomTableMatrix.mjs';
 
     //stands for 'Random integer in range'
     function riir(min, max) {
@@ -63,9 +63,10 @@
         return { n, m, availableTableWidth };
     }
 
-    function createTableFromMatrix(tableMatrix, id, containerSelector, width = null) {
+    function createTableFromMatrix(tableMatrix, id, containerSelector, title, width = null) {
         $(`#${id}`).remove();
         const $newTable = $('#prototypeTable').clone().attr('id', id).appendTo(containerSelector);
+        $newTable.find('caption h2').text(title);
         tableMatrix[0].forEach(cell => {
             $newTable.find(`colgroup`).append('<col/>');
         });
@@ -98,7 +99,7 @@
         const AvailablePixelWidth = AvailablePixelContentWidth + CELL_BORDER_WIDTH * 2 * inputs.m;
 
         (function createAutomaticBrowserTable(){
-            createTableFromMatrix(tableMatrix, 'browserTable', '#browserTableContainer', AvailablePixelWidth);
+            createTableFromMatrix(tableMatrix, 'browserTable', '#browserTableContainer', 'Automatic Browser Layout', AvailablePixelWidth);
             const autoBrowserPixelWidths = $('#browserTable tr:first td').map( (i, el) => $(el).width() ).get();
             const columnPixelMaxMinWidths = columnMaxMinWidths.map(col => ({
                 minWidth: columnWidthToPixels(col.minWidth).toFixed(2),
@@ -116,8 +117,7 @@
         // Rest of this method is for user-triggered events (not related to learning from browser)
 
         function buildManualLayoutTable() {
-            createTableFromMatrix(tableMatrix, 'manualTable', '#manualTableContainer');
-            $('#manualTable caption h2').text('Manual (algorithm) layout');
+            createTableFromMatrix(tableMatrix, 'manualTable', '#manualTableContainer', 'Manual (algorithm) layout');
             $('#manualTable colgroup col').width(AvailablePixelWidth/inputs.m);
             $('#btnLayout').show();
         }

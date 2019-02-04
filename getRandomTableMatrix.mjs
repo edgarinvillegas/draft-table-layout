@@ -29,3 +29,7 @@ export function getRandomTableMatrix(n, m) {
     }
     return getTableMatrix();
 }
+
+export default {
+    getRandomTableMatrix
+};

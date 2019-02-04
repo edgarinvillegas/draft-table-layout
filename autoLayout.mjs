@@ -66,3 +66,8 @@ export function getColumnWidthsByMaxMins(columnMaxMinWidths, availableTableWidth
         return colWidths;
     }
 }
+
+export default {
+    getColumnWidthsByMaxMins,
+    getColumnMaxMinWidths
+};
