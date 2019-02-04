@@ -3,10 +3,12 @@ Table autolayout algorithm:
 https://www.w3.org/TR/REC-html40/appendix/notes.html#h-B.5.2
 */
 
+/*
 function autoLayout(tableMatrix, availableTableWidth) {
     const columnMaxMinWidths = getColumnMaxMinWidths(tableMatrix);
     return getColumnWidthsByMaxMins(columnMaxMinWidths, availableTableWidth);
 }
+*/
 
 function getColumnMaxMinWidths(tableMatrix) {
     const maxReducer = (max, current) =>  current >= max ? current: max ;
@@ -49,8 +51,10 @@ function getColumnWidthsByMaxMins(columnMaxMinWidths, availableTableWidth) {
     }
     // 2. The maximum table width fits within the available space. In this case, set the columns to their maximum widths.
     else if(maxTableWidth < availableTableWidth) {
-        console.log('Case 2: Max table width is lower than the available. Use maximum')
-        return columnMaxMinWidths.map(col => col.maxWidth);
+        console.log('Case 2: Max table width is lower than the available.')
+        // return columnMaxMinWidths.map(col => col.maxWidth);  // Original algorithm logic (Minimum space)
+        // Here we're deviating from original algorithm and stretching to the availableTableWidth
+        return columnMaxMinWidths.map(col => col.maxWidth).map( cw => cw/maxTableWidth * availableTableWidth);
     }
     // 3. The maximum width of the table is greater than the available space, but the minimum table width is smaller
     else {
