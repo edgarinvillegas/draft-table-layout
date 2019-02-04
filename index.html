@@ -33,6 +33,9 @@
         <tbody></tbody>
     </table>
     <div id="browserTableContainer" class="container">
+        <div>
+            <button id="btnNewSample">Generate new table</button>
+        </div>
         <button id="btnStartLearning">Start learning</button>
         <button id="btnStopLearning" disabled>Stop learning</button>
         <!-- Table will come here -->
@@ -131,7 +134,7 @@
         // Rest of this method is for user-triggered events (not related to learning from browser)
 
         function buildManualLayoutTable() {
-            createTableFromMatrix(tableMatrix, 'manualTable', '#manualTableContainer', 'HTML algorithm layout');
+            createTableFromMatrix(tableMatrix, 'manualTable', '#manualTableContainer', 'No algorithm layout yet');
             $('#manualTable colgroup col').width(AvailablePixelWidth/inputs.m);
             $('#btnLayout').show();
         }
@@ -141,7 +144,7 @@
             // Log input in NN format
             const dataToLog = columnMaxMinWidths.map(col => [col.minWidth, col.maxWidth]).reduce((acc, val) => acc.concat(val), []);
             console.log(`input: ${JSON.stringify(dataToLog)}`);
-            createTableFromMatrix(tableMatrix, 'mlTable', '#mlTableContainer', 'Machine Learning layout');
+            createTableFromMatrix(tableMatrix, 'mlTable', '#mlTableContainer', 'No layout');
             $('#mlTable colgroup col').width(AvailablePixelWidth/inputs.m);
             $('#btnLayoutML').show();
         }
@@ -157,6 +160,8 @@
             columnWidths.forEach((cw, j) => {
                 $(`#manualTable colgroup col:eq(${j})`).width(columnWidthToPixels(cw) + CELL_BORDER_WIDTH * 2 );
             });
+            //Machine Learning layout
+            $('#manualTable').find('caption h2').text('Algorithm layout');
         }
         document.getElementById('btnLayout').onclick = doLayout;
 
@@ -166,10 +171,12 @@
             columnWidths.forEach((cw, j) => {
                 $(`#mlTable colgroup col:eq(${j})`).width(columnWidthToPixels(cw) + CELL_BORDER_WIDTH * 2 );
             });
+            $('#mlTable').find('caption h2').text('Machine learning layout');
         }
         document.getElementById('btnLayoutML').onclick = doLayoutML;
         if(--learnCounter == 0) stopLearning();
     }
+    document.getElementById('btnNewSample').onclick = learn;
     learn();
 
     let interval = null;
