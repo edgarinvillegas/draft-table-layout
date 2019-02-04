@@ -3,14 +3,7 @@ Table autolayout algorithm:
 https://www.w3.org/TR/REC-html40/appendix/notes.html#h-B.5.2
 */
 
-/*
-function autoLayout(tableMatrix, availableTableWidth) {
-    const columnMaxMinWidths = getColumnMaxMinWidths(tableMatrix);
-    return getColumnWidthsByMaxMins(columnMaxMinWidths, availableTableWidth);
-}
-*/
-
-function getColumnMaxMinWidths(tableMatrix) {
+export function getColumnMaxMinWidths(tableMatrix) {
     const maxReducer = (max, current) =>  current >= max ? current: max ;
     // Calculate max and min widths
     const auxMatrix = tableMatrix.map(row => {
@@ -38,7 +31,7 @@ function getColumnMaxMinWidths(tableMatrix) {
     return columnMaxMinWidths;
 }
 
-function getColumnWidthsByMaxMins(columnMaxMinWidths, availableTableWidth) {
+export function getColumnWidthsByMaxMins(columnMaxMinWidths, availableTableWidth) {
     const sumReducer = (acum, width) => acum + width;
     //Minimum table width is the sum of all the column minimum widths
     const minTableWidth = columnMaxMinWidths.map(col => col.minWidth).reduce(sumReducer, 0);

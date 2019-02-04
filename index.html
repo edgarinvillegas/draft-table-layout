@@ -24,8 +24,6 @@
         }
     </style>
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-    <script src="getRandomTableMatrix.js"></script>
-    <script src="autoLayout.js"></script>
 </head>
 <body>
     <table id="prototypeTable" contenteditable  cellspacing="0" cellpadding="0">
@@ -35,8 +33,8 @@
     </table>
     <div id="browserTableContainer" class="container">
         <button id="btnCopyBrowserTable">Copy table without layout</button>
-        <button id="btnStartLearning" onclick="startLearning()">Start learning</button>
-        <button id="btnStopLearning" onclick="stopLearning()" disabled>Stop learning</button>
+        <button id="btnStartLearning">Start learning</button>
+        <button id="btnStopLearning" disabled>Stop learning</button>
         <!-- Table will come here -->
     </div>
 
@@ -45,7 +43,10 @@
         <!-- Table will come here -->
     </div>
 </body>
-<script>
+<script type="module">
+    import { getColumnMaxMinWidths, getColumnWidthsByMaxMins } from './autoLayout.js';
+    import { getRandomTableMatrix } from './getRandomTableMatrix.js';
+
     //stands for 'Random integer in range'
     function riir(min, max) {
         return min + Math.floor(Math.random() * (max - min + 1));
@@ -96,19 +97,22 @@
 
         const AvailablePixelContentWidth = (inputs.availableTableWidth * charPixelWidth)
         const AvailablePixelWidth = AvailablePixelContentWidth + CELL_BORDER_WIDTH * 2 * inputs.m;
-        createTableFromMatrix(tableMatrix, 'browserTable', '#browserTableContainer', AvailablePixelWidth);
-        const autoBrowserPixelWidths = $('#browserTable tr:first td').map( (i, el) => $(el).width() ).get();
-        const columnPixelMaxMinWidths = columnMaxMinWidths.map(col => ({
-            minWidth: columnWidthToPixels(col.minWidth).toFixed(2),
-            maxWidth: columnWidthToPixels(col.maxWidth).toFixed(2)
-        }));
-        // This is logs the inputs and outputs
-        const dataToLog = {
-            tableWidth: AvailablePixelContentWidth.toFixed(2),
-            maxMinWidths: columnPixelMaxMinWidths,
-            output: autoBrowserPixelWidths
-        };
-        console.log(`${JSON.stringify(dataToLog)}`);
+
+        (function createAutomaticBrowserTable(){
+            createTableFromMatrix(tableMatrix, 'browserTable', '#browserTableContainer', AvailablePixelWidth);
+            const autoBrowserPixelWidths = $('#browserTable tr:first td').map( (i, el) => $(el).width() ).get();
+            const columnPixelMaxMinWidths = columnMaxMinWidths.map(col => ({
+                minWidth: columnWidthToPixels(col.minWidth).toFixed(2),
+                maxWidth: columnWidthToPixels(col.maxWidth).toFixed(2)
+            }));
+            // This is logs the inputs and outputs
+            const dataToLog = {
+                tableWidth: AvailablePixelContentWidth.toFixed(2),
+                maxMinWidths: columnPixelMaxMinWidths,
+                output: autoBrowserPixelWidths
+            };
+            console.log(`${JSON.stringify(dataToLog)}`);
+        })();
 
         // Rest of this method is for user-triggered events (not related to learning from browser)
 
@@ -149,6 +153,9 @@
         $('#btnStartLearning').prop('disabled', isLearning);
         $('#btnStopLearning').prop('disabled', !isLearning);
     }
+
+    $('#btnStartLearning').click(startLearning);
+    $('#btnStopLearning').click(stopLearning);
 
 </script>
 </html>
