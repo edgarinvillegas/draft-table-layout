@@ -35,7 +35,8 @@
     </table>
     <div id="browserTableContainer" class="container">
         <button id="btnCopyBrowserTable">Copy table without layout</button>
-        <button onclick="startLearning()">Start learning</button>
+        <button id="btnStartLearning" onclick="startLearning()">Start learning</button>
+        <button id="btnStopLearning" onclick="stopLearning()" disabled>Stop learning</button>
         <!-- Table will come here -->
     </div>
 
@@ -83,53 +84,71 @@
     }
 
     const charPixelWidth = 8.8;
-    const CELL_BORDER_WIDTH = 10;    //
+    const CELL_BORDER_WIDTH = 1;    //
 
     const columnWidthToPixels = cw => cw * charPixelWidth;
 
-    function startLearning() {
-        (function learn(){
-            const inputs = getRandomInputs();
-            const tableMatrix = getRandomTableMatrix(inputs.n, inputs.m);
+    function learn(){
+        const inputs = getRandomInputs();
+        const tableMatrix = getRandomTableMatrix(inputs.n, inputs.m);
 
-            const columnMaxMinWidths = getColumnMaxMinWidths(tableMatrix);
+        const columnMaxMinWidths = getColumnMaxMinWidths(tableMatrix);
 
-            const AvailablePixelContentWidth = (inputs.availableTableWidth * charPixelWidth)
-            const AvailablePixelWidth = AvailablePixelContentWidth + CELL_BORDER_WIDTH * 2 * inputs.m;
-            createTableFromMatrix(tableMatrix, 'browserTable', '#browserTableContainer', AvailablePixelWidth);
-            const autoBrowserPixelWidths = $('#browserTable tr:first td').map( (i, el) => $(el).width() ).get();
-            const columnPixelMaxMinWidths = columnMaxMinWidths.map(col => ({
-                minWidth: columnWidthToPixels(col.minWidth).toFixed(2),
-                maxWidth: columnWidthToPixels(col.maxWidth).toFixed(2)
-            }));
-            // This is logs the inputs and outputs
-            console.log(`${AvailablePixelContentWidth.toFixed(2)} ${JSON.stringify(columnPixelMaxMinWidths)} ${JSON.stringify(autoBrowserPixelWidths)}`);
+        const AvailablePixelContentWidth = (inputs.availableTableWidth * charPixelWidth)
+        const AvailablePixelWidth = AvailablePixelContentWidth + CELL_BORDER_WIDTH * 2 * inputs.m;
+        createTableFromMatrix(tableMatrix, 'browserTable', '#browserTableContainer', AvailablePixelWidth);
+        const autoBrowserPixelWidths = $('#browserTable tr:first td').map( (i, el) => $(el).width() ).get();
+        const columnPixelMaxMinWidths = columnMaxMinWidths.map(col => ({
+            minWidth: columnWidthToPixels(col.minWidth).toFixed(2),
+            maxWidth: columnWidthToPixels(col.maxWidth).toFixed(2)
+        }));
+        // This is logs the inputs and outputs
+        const dataToLog = {
+            tableWidth: AvailablePixelContentWidth.toFixed(2),
+            maxMinWidths: columnPixelMaxMinWidths,
+            output: autoBrowserPixelWidths
+        };
+        console.log(`${JSON.stringify(dataToLog)}`);
 
-            // Rest of this method is for user-triggered events (not related to learning from browser)
+        // Rest of this method is for user-triggered events (not related to learning from browser)
 
-            function buildManualLayoutTable() {
-                createTableFromMatrix(tableMatrix, 'manualTable', '#manualTableContainer');
-                $('#manualTable caption h2').text('Manual (algorithm) layout');
-                $('#manualTable colgroup col').width(AvailablePixelWidth/inputs.m);
-                $('#btnLayout').show();
-            }
-            document.getElementById('btnCopyBrowserTable').onclick = buildManualLayoutTable;
+        function buildManualLayoutTable() {
+            createTableFromMatrix(tableMatrix, 'manualTable', '#manualTableContainer');
+            $('#manualTable caption h2').text('Manual (algorithm) layout');
+            $('#manualTable colgroup col').width(AvailablePixelWidth/inputs.m);
+            $('#btnLayout').show();
+        }
+        document.getElementById('btnCopyBrowserTable').onclick = buildManualLayoutTable;
 
-            function doLayout() {
-                const columnWidths = getColumnWidthsByMaxMins(columnMaxMinWidths, inputs.availableTableWidth);
-                // const columnWidths = autoLayout(tableMatrix, inputs.availableTableWidth);
-                console.log('Widths: ', columnWidths);
-                console.log('Widths in pixels', columnWidths.map(cw => cw * charPixelWidth));
-                console.log('Total width: ', columnWidths.reduce((acum, curr) => acum + curr, 0));
-                console.log('Total width in pixels: ', columnWidths.map(cw => cw * charPixelWidth).reduce((acum, curr) => acum + curr, 0));
-                columnWidths.forEach((cw, j) => {
-                    $(`#manualTable colgroup col:eq(${j})`).width(cw => columnWidthToPixels(cw) + CELL_BORDER_WIDTH * 2 );
-                });
-            }
-            document.getElementById('btnLayout').onclick = doLayout;
-        })();
+        function doLayout() {
+            const columnWidths = getColumnWidthsByMaxMins(columnMaxMinWidths, inputs.availableTableWidth);
+            // const columnWidths = autoLayout(tableMatrix, inputs.availableTableWidth);
+            console.log('Widths: ', columnWidths);
+            console.log('Widths in pixels', columnWidths.map(cw => cw * charPixelWidth));
+            console.log('Total width: ', columnWidths.reduce((acum, curr) => acum + curr, 0));
+            console.log('Total width in pixels: ', columnWidths.map(cw => cw * charPixelWidth).reduce((acum, curr) => acum + curr, 0));
+            columnWidths.forEach((cw, j) => {
+                $(`#manualTable colgroup col:eq(${j})`).width(cw => columnWidthToPixels(cw) + CELL_BORDER_WIDTH * 2 );
+            });
+        }
+        document.getElementById('btnLayout').onclick = doLayout;
     }
-    startLearning();
+    learn();
+
+    let interval = null;
+    function startLearning() {
+        stopLearning();
+        interval = setInterval(learn, 250);
+        reflectLearningStatusInView(true);
+    }
+    function stopLearning() {
+        clearInterval(interval);
+        reflectLearningStatusInView(false);
+    }
+    function reflectLearningStatusInView(isLearning){
+        $('#btnStartLearning').prop('disabled', isLearning);
+        $('#btnStopLearning').prop('disabled', !isLearning);
+    }
 
 </script>
 </html>
